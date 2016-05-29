@@ -1,0 +1,32 @@
+description 'Gradle C++'
+version '1.0'
+
+apply plugin: 'cpp'
+
+model {
+    components {
+        blockSegmentation(NativeLibrarySpec) {
+            binaries.all {
+                if (targetPlatform.getDisplayName().endsWith("'windows_x86'")) {
+                    cppCompiler.args "-I${includeUcrtDir}"
+                    linker.args "/LIBPATH:${libsUcrtDir}"
+                }
+            }
+        }
+
+        main(NativeExecutableSpec) {
+            sources.cpp.lib library: "blockSegmentation", linkage: "static"
+            binaries.all {
+                if (targetPlatform.getDisplayName().endsWith("'windows_x86'")) {
+                    cppCompiler.args "-I${includeUcrtDir}"
+                    linker.args "/LIBPATH:${libsUcrtDir}"
+                }
+            }
+        }
+    }        
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.9'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+}
